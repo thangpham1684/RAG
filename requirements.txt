@@ -1,0 +1,50 @@
+# ============================================================
+# RAG Enterprise Pro — Python Dependencies
+# ============================================================
+# Cài đặt: pip install -r requirements.txt
+# ============================================================
+
+# ---------- Web Framework & API ----------
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.0.0
+requests>=2.31.0
+
+# ---------- LlamaIndex Core ----------
+llama-index-core>=0.12.0
+
+# ---------- LlamaIndex Vector Store ----------
+llama-index-vector-stores-qdrant>=0.4.0
+
+# ---------- LlamaIndex Embeddings ----------
+llama-index-embeddings-huggingface>=0.5.0
+
+# ---------- LlamaIndex LLMs ----------
+llama-index-llms-gemini>=0.4.0
+
+# ---------- LlamaIndex Readers ----------
+llama-index-readers-file>=0.4.0
+
+# ---------- LlamaIndex Retrievers ----------
+llama-index-retrievers-bm25>=0.5.0
+
+# ---------- Vector DB ----------
+qdrant-client>=1.12.0
+
+# ---------- ML / Sentence Transformers & Embeddings ----------
+sentence-transformers>=3.3.0
+torch>=2.4.0
+transformers>=4.46.0
+
+# ---------- PDF Parsing ----------
+kreuzberg>=4.3.0
+
+# ---------- Evaluation (RAGAS) ----------
+ragas>=0.2.0,<0.3.0      # Legacy API (evaluate(ds, metrics=...)) — 0.3+ broke compatibility
+langchain-google-genai>=2.0.0
+datasets>=3.0.0
+
+# ---------- Utilities ----------
+python-dotenv>=1.0.0
+pandas>=2.2.0
+tiktoken>=0.8.0                         # LlamaIndex token counting

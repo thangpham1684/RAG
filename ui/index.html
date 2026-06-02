@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Enterprise Pro</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;display=swap">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g"
+          crossorigin="anonymous">
+
+    <!-- Highlight.js Theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.min.css"
+          integrity="sha384-PiLidnnRuzFgp4qiN8oGNmktrV8ETL+6a8heAxljUX4A+3XWlocwaMn9duBUepfK"
+          crossorigin="anonymous">
+
+    <!-- Marked (markdown parser) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer
+            integrity="sha384-948ahk4ZmxYVYOc+rxN1H2gM1EJ2Duhp7uHtZ4WSLkV4Vtx5MUqnV+l7u9B+jFv+"
+            crossorigin="anonymous"></script>
+
+    <!-- DOMPurify (XSS sanitizer) -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js" defer
+            integrity="sha384-C5g1ZoYBpnvKyArNZI21kaBEk3egHOYfHj/cUOHmyJ7CSDMyNMyM+STqfkBt8m2Y"
+            crossorigin="anonymous"></script>
+
+    <!-- Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer
+            integrity="sha384-F/bZzf7p3Joyp5psL90p/p89AZJsndkSoGwRpXcZhleCWhd8SnRuoYo4d0yirjJp"
+            crossorigin="anonymous"></script>
+
+    <!-- Local styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Sidebar overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <div class="app-wrapper">
+
+        <!-- ============ SIDEBAR ============ -->
+        <aside class="sidebar" id="sidebar">
+
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-layer-group" aria-hidden="true"></i>
+                    <span>RAG <span class="logo-accent">Pro</span></span>
+                </div>
+                <button class="sidebar-close" id="sidebar-close" type="button" aria-label="Đóng thanh bên">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-content">
+
+                <!-- Panel: Hệ thống -->
+                <section class="panel">
+                    <h2 class="panel-title"><i class="fas fa-server" aria-hidden="true"></i> Hệ thống</h2>
+                    <div class="status-list" id="status-list">
+                        <div class="status-item" id="api-status">
+                            <div class="status-dot status-dot-pulse"></div>
+                            <span>Đang chờ API...</span>
+                        </div>
+                        <div class="status-item" id="db-status">
+                            <div class="status-dot status-dot-pulse"></div>
+                            <span>Đang chờ Vector DB...</span>
+                        </div>
+                        <div class="status-item" id="files-status">
+                            <div class="status-dot"></div>
+                            <span>Tài liệu: <strong id="files-count-value">0</strong></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Panel: Tài liệu -->
+                <section class="panel" id="file-section">
+                    <h2 class="panel-title">
+                        <i class="fas fa-file-alt" aria-hidden="true"></i> Tài liệu
+                        <span class="badge" id="file-filter-count">0</span>
+                    </h2>
+                    <p class="panel-desc">Chọn file để giới hạn phạm vi tìm kiếm</p>
+
+                    <!-- Upload area -->
+                    <div class="upload-area" id="upload-area">
+                        <input type="file" id="file-input" accept=".pdf,.doc,.docx,.xlsx,.csv,.pptx" multiple style="display:none">
+                        <i class="fas fa-cloud-upload-alt upload-icon" aria-hidden="true"></i>
+                        <span class="upload-text">Kéo thả hoặc <strong>chọn file</strong></span>
+                        <span class="upload-hint">PDF, DOCX, XLSX, CSV, PPTX</span>
+                        <div class="upload-progress" id="upload-progress" style="display:none">
+                            <div class="progress-track">
+                                <div class="progress-fill" id="upload-progress-fill" style="width:0%"></div>
+                            </div>
+                            <span class="progress-text" id="upload-progress-text">Đang tải lên...</span>
+                        </div>
+                        <div class="upload-message" id="upload-message"></div>
+                    </div>
+
+                    <!-- File list -->
+                    <div class="file-list" id="file-list"></div>
+
+                    <!-- File actions -->
+                    <div class="file-actions">
+                        <button class="btn btn-sm btn-outline" id="btn-refresh-files" type="button">
+                            <i class="fas fa-sync-alt" aria-hidden="true"></i> Làm mới
+                        </button>
+                        <button class="btn btn-sm btn-ghost" id="btn-clear-files" type="button">
+                            <i class="fas fa-times" aria-hidden="true"></i> Bỏ chọn
+                        </button>
+                    </div>
+
+                    <div id="file-filter-info" class="filter-info"></div>
+                </section>
+
+                <!-- Panel: Dữ liệu -->
+                <section class="panel">
+                    <h2 class="panel-title"><i class="fas fa-database" aria-hidden="true"></i> Dữ liệu</h2>
+                    <div id="ingestion-progress" class="ingestion-progress" style="display:none">
+                        <div class="progress-track">
+                            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+                        </div>
+                        <span class="progress-text" id="progress-text">Đang xử lý...</span>
+                    </div>
+                    <button class="btn btn-primary" id="btn-reindex" type="button">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i> Xây dựng index
+                    </button>
+                    <div id="index-message" class="info-message"></div>
+                </section>
+
+                <!-- Panel: API Keys -->
+                <section class="panel" id="api-keys-panel">
+                    <h2 class="panel-title">
+                        <i class="fas fa-key" aria-hidden="true"></i> API Keys
+                        <span class="badge" id="api-keys-count">0</span>
+                    </h2>
+
+                    <div id="api-keys-list" class="api-keys-list"></div>
+                    <div id="api-keys-error" class="upload-message" style="display:none"></div>
+
+                    <!-- Create key form (hidden by default) -->
+                    <div id="create-key-form" class="create-key-form" style="display:none">
+                        <input type="text" id="new-key-name" class="key-name-input" placeholder="Tên key (vd: CI/CD Pipeline)" maxlength="60">
+                        <div class="file-actions" style="margin-top:6px">
+                            <button class="btn btn-sm btn-primary" id="btn-confirm-create-key" type="button">
+                                <i class="fas fa-plus" aria-hidden="true"></i> Tạo
+                            </button>
+                            <button class="btn btn-sm btn-ghost" id="btn-cancel-create-key" type="button">
+                                <i class="fas fa-times" aria-hidden="true"></i> Huỷ
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Newly created key (shown once) -->
+                    <div id="new-key-display" class="new-key-display" style="display:none">
+                        <p class="key-warning"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Key chỉ hiển thị một lần!</p>
+                        <div class="key-reveal">
+                            <code id="new-key-value" class="key-value"></code>
+                            <button id="btn-copy-key" class="btn-copy-key" type="button" title="Sao chép key">
+                                <i class="fas fa-copy" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-sm btn-ghost" id="btn-dismiss-new-key" type="button" style="margin-top:6px;width:100%">
+                            Đã lưu lại
+                        </button>
+                    </div>
+
+                    <button class="btn btn-sm btn-outline" id="btn-create-key" type="button" style="width:100%;margin-top:8px">
+                        <i class="fas fa-plus" aria-hidden="true"></i> Tạo API key mới
+                    </button>
+                </section>
+
+                <!-- Panel: Bằng chứng -->
+                <section class="panel">
+                    <h2 class="panel-title"><i class="fas fa-balance-scale" aria-hidden="true"></i> Bằng chứng</h2>
+                    <div class="toggle-row" id="evidence-toggle-row">
+                        <span>Hiển thị phân tích</span>
+                        <label class="toggle-switch" for="evidence-toggle" aria-label="Hiển thị phân tích">
+                            <input type="checkbox" id="evidence-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </section>
+
+            </div>
+
+            <div class="sidebar-footer">
+                <span class="version-info">RAG Enterprise v2.0</span>
+            </div>
+        </aside>
+
+        <!-- ============ MAIN CHAT ============ -->
+        <main class="chat-wrapper">
+
+            <header class="chat-header">
+                <button class="btn btn-icon" id="sidebar-toggle" type="button" aria-label="Bật thanh bên">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+                <div class="header-info">
+                    <h1>Trợ lý Chuyên gia</h1>
+                    <p class="header-subtitle">Tra cứu ngữ cảnh nội bộ &mdash; thời gian thực</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-icon" id="btn-clear-chat" type="button" title="Xoá đoạn chat">
+                        <i class="fas fa-eraser" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="chat-display" id="chat-history">
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-state-icon" aria-hidden="true">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h2>Tôi có thể giúp gì cho bạn?</h2>
+                    <p>Hỏi tôi bất kỳ thông tin nào có trong tài liệu nội bộ. Tôi sẽ trích xuất và tổng hợp câu trả lời với trích dẫn nguồn.</p>
+                    <div class="suggestion-chips">
+                        <span class="chip" role="button" tabindex="0" data-prompt="Tóm tắt nội dung các tài liệu hiện có">
+                            <i class="fas fa-list" aria-hidden="true"></i> Tóm tất cả tài liệu
+                        </span>
+                        <span class="chip" role="button" tabindex="0" data-prompt="Phân tích các điểm chính trong dữ liệu">
+                            <i class="fas fa-chart-bar" aria-hidden="true"></i> Phân tích dữ liệu
+                        </span>
+                        <span class="chip" role="button" tabindex="0" data-prompt="So sánh thông tin giữa các tài liệu khác nhau">
+                            <i class="fas fa-code-compare" aria-hidden="true"></i> So sánh tài liệu
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <form id="chat-form" class="chat-input-box" autocomplete="off" onsubmit="return false;">
+                    <textarea
+                        id="chat-input"
+                        placeholder="Nhập câu hỏi... (Shift+Enter = xuống dòng)"
+                        rows="1"
+                        disabled
+                    ></textarea>
+                    <button type="submit" id="btn-send" class="btn-send" disabled aria-label="Gửi tin nhắn">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                    </button>
+                </form>
+                <div class="chat-footer-text">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                    Hệ thống có thể mắc sai sót. Vui lòng kiểm tra lại bằng văn bản gốc.
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

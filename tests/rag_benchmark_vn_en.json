@@ -1,0 +1,50 @@
+[
+  {
+    "id": "vn-synthetic-role",
+    "language": "vi",
+    "query": "Vai tro cua synthetic time series data trong Mamba4Cast la gi?",
+    "expected_file_tokens": ["datn", "atn"]
+  },
+  {
+    "id": "vn-dataset-olist",
+    "language": "vi",
+    "query": "Do an su dung bo du lieu nao cho phan thuc nghiem?",
+    "expected_file_tokens": ["datn", "atn"]
+  },
+  {
+    "id": "vn-mamba4cast-summary",
+    "language": "vi",
+    "query": "Tom tat y tuong chinh cua Mamba4Cast trong tai lieu",
+    "expected_file_tokens": ["datn", "atn"]
+  },
+  {
+    "id": "vn-ga-method",
+    "language": "vi",
+    "query": "Tai lieu algoritmos ap dung phuong phap nao de giai bai toan vi tri?",
+    "expected_file_tokens": ["algoritmos"]
+  },
+  {
+    "id": "en-synthetic-role",
+    "language": "en",
+    "query": "What is the role of synthetic time series data in Mamba4Cast?",
+    "expected_file_tokens": ["datn", "atn"]
+  },
+  {
+    "id": "en-olist-dataset",
+    "language": "en",
+    "query": "Which dataset is used in the experiments?",
+    "expected_file_tokens": ["datn", "atn"]
+  },
+  {
+    "id": "en-facility-location",
+    "language": "en",
+    "query": "How is the facility location problem addressed in the genetic algorithms paper?",
+    "expected_file_tokens": ["algoritmos"]
+  },
+  {
+    "id": "en-ga-results",
+    "language": "en",
+    "query": "Summarize the results discussed in the genetic algorithms document",
+    "expected_file_tokens": ["algoritmos"]
+  }
+]
